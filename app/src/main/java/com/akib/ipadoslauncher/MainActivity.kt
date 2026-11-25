@@ -1,6 +1,9 @@
 package com.akib.ipadoslauncher
 
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.drawable.Drawable
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.provider.Settings
@@ -18,6 +21,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -96,11 +100,7 @@ fun LauncherScreen() {
                                 .background(Color(0xFF29364D), RoundedCornerShape(20.dp)),
                             contentAlignment = Alignment.Center
                         ) {
-                            androidx.compose.foundation.Image(
-                                androidx.compose.ui.graphics.painter.DrawablePainter(app.icon),
-                                app.title,
-                                Modifier.fillMaxSize().padding(4.dp)
-                            )
+                            AppIcon(app.icon, app.title, Modifier.fillMaxSize().padding(4.dp))
                             if (edit) {
                                 Text(
                                     "−",
@@ -138,11 +138,7 @@ fun LauncherScreen() {
                             }
                         }
                     ) {
-                        androidx.compose.foundation.Image(
-                            androidx.compose.ui.graphics.painter.DrawablePainter(app.icon),
-                            app.title,
-                            Modifier.fillMaxSize()
-                        )
+                        AppIcon(app.icon, app.title, Modifier.fillMaxSize())
                     }
                 }
             }
@@ -221,4 +217,27 @@ fun LauncherScreen() {
             }
         )
     }
+}
+
+
+@Composable
+private fun AppIcon(
+    drawable: Drawable,
+    title: String,
+    modifier: Modifier = Modifier
+) {
+    val imageBitmap = remember(drawable) {
+        val width = (drawable.intrinsicWidth.takeIf { it > 0 } ?: 96).coerceAtMost(512)
+        val height = (drawable.intrinsicHeight.takeIf { it > 0 } ?: 96).coerceAtMost(512)
+        val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(bitmap)
+        drawable.setBounds(0, 0, width, height)
+        drawable.draw(canvas)
+        bitmap.asImageBitmap()
+    }
+    androidx.compose.foundation.Image(
+        bitmap = imageBitmap,
+        contentDescription = title,
+        modifier = modifier
+    )
 }

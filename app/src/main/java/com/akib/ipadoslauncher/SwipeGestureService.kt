@@ -7,13 +7,12 @@ import android.view.Gravity
 import android.view.MotionEvent
 import android.view.View
 import android.view.WindowManager
+import android.widget.FrameLayout
 import android.view.accessibility.AccessibilityEvent
 
 /**
- * Provides an optional iPad-like bottom gesture handle.
- * Swiping the handle up opens Android's own Recents screen, where the user
- * can swipe an app card away. Android does not permit ordinary launchers to
- * force-stop other apps directly.
+ * Adds a comfortable bottom swipe target on top of other apps.
+ * Swipe up to open Android Recents, then swipe an app card away to dismiss it.
  */
 class SwipeGestureService : AccessibilityService() {
     private var windowManager: WindowManager? = null
@@ -31,14 +30,28 @@ class SwipeGestureService : AccessibilityService() {
         if (gestureHandle != null) return
 
         val density = resources.displayMetrics.density
-        val handle = View(this).apply {
-            contentDescription = "Swipe up to open Recent Apps; tap to go Home"
+        val visiblePill = View(this).apply {
             background = GradientDrawable().apply {
                 shape = GradientDrawable.RECTANGLE
                 cornerRadius = 20f * density
                 setColor(0xFFF4F5FA.toInt())
             }
             alpha = 0.88f
+            isClickable = false
+        }
+
+        // The transparent touch area is taller than the visible pill so it is
+        // practical to grab with a thumb without covering app content.
+        val touchArea = FrameLayout(this).apply {
+            contentDescription = "Swipe up to open Recent Apps; tap to go Home"
+            addView(
+                visiblePill,
+                FrameLayout.LayoutParams(
+                    (72f * density).toInt(),
+                    (5f * density).toInt(),
+                    Gravity.CENTER
+                )
+            )
             setOnClickListener {
                 performGlobalAction(GLOBAL_ACTION_HOME)
             }
@@ -68,8 +81,8 @@ class SwipeGestureService : AccessibilityService() {
         }
 
         val params = WindowManager.LayoutParams(
-            (72f * density).toInt(),
-            (5f * density).toInt(),
+            (112f * density).toInt(),
+            (34f * density).toInt(),
             WindowManager.LayoutParams.TYPE_ACCESSIBILITY_OVERLAY,
             WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or
                 WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL or
@@ -77,11 +90,11 @@ class SwipeGestureService : AccessibilityService() {
             PixelFormat.TRANSLUCENT
         ).apply {
             gravity = Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL
-            y = (10f * density).toInt()
+            y = (8f * density).toInt()
         }
 
-        runCatching { windowManager?.addView(handle, params) }
-            .onSuccess { gestureHandle = handle }
+        runCatching { windowManager?.addView(touchArea, params) }
+            .onSuccess { gestureHandle = touchArea }
     }
 
     override fun onAccessibilityEvent(event: AccessibilityEvent?) = Unit

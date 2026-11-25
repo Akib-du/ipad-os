@@ -9,6 +9,14 @@
         <activity
             android:name=".MainActivity"
             android:exported="true">
+
+            <!-- Makes the app visible and launchable from the normal app drawer. -->
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+
+            <!-- Registers this activity as a selectable Android Home app. -->
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.HOME" />

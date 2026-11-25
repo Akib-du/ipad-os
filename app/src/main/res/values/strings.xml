@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="swipe_service_description">Adds a bottom swipe handle. Swipe up to open Android Recent Apps and dismiss an app card.</string>
+</resources>

@@ -86,7 +86,7 @@ fun LauncherScreen() {
                                 chosen = app
                             } else {
                                 runCatching {
-                                    pm.getLaunchIntentForPackage(app.pkg)?.let(ctx::startActivity)
+                                    pm.getLaunchIntentForPackage(app.pkg)?.let { launchIntent -> ctx.startActivity(launchIntent) }
                                 }
                             }
                         }
@@ -134,7 +134,7 @@ fun LauncherScreen() {
                     Box(
                         Modifier.padding(horizontal = 8.dp).size(44.dp).clickable {
                             runCatching {
-                                pm.getLaunchIntentForPackage(app.pkg)?.let(ctx::startActivity)
+                                pm.getLaunchIntentForPackage(app.pkg)?.let { launchIntent -> ctx.startActivity(launchIntent) }
                             }
                         }
                     ) {
